@@ -1,4 +1,4 @@
-import TimeSheetTable from '@/components/timesheet/timesheet-table';
+import TimeSheetTable from '@/features/timesheets/components/timesheet-table';
 import { ITimeSheetItem, TimeSheetStatus } from '@/types';
 import React from 'react';
 

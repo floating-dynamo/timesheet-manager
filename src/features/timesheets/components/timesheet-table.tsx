@@ -39,7 +39,7 @@ const TimeSheetTable = ({ timeSheetList }: TimeSheetTableProps) => {
                 </span>
               </td>
               <td className="px-4 py-3">
-                <TimeSheetAction status={row.status} />
+                <TimeSheetAction status={row.status} id={row.id} />
               </td>
             </tr>
           ))}

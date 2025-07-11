@@ -1,13 +1,15 @@
 import { TimeSheetStatus } from '@/types';
+import Link from 'next/link';
 import React from 'react';
 
 interface TimeSheetActionProps {
   status: TimeSheetStatus;
+  id: string;
 }
 
-const TimeSheetAction = ({ status }: TimeSheetActionProps) => {
+const TimeSheetAction = ({ status, id }: TimeSheetActionProps) => {
   if (status === TimeSheetStatus.COMPLETED) {
-    return <a href="">View</a>;
+    return <Link href={`timesheets/${id}`}>View</Link>;
   }
 
   if (status === TimeSheetStatus.IN_COMPLETE) {

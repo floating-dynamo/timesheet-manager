@@ -18,3 +18,11 @@ export interface ITimeSheetItem {
   };
   status: TimeSheetStatus;
 }
+
+export interface ITask {
+  project: string;
+  typeOfWork: string;
+  description: string;
+  hours: number;
+  date: Date;
+}
