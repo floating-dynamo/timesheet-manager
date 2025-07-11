@@ -1,4 +1,3 @@
-import Footer from '@/components/footer';
 import TimeSheetTable from '@/components/timesheet/timesheet-table';
 import { ITimeSheetItem, TimeSheetStatus } from '@/types';
 import React from 'react';
@@ -53,14 +52,9 @@ const data: ITimeSheetItem[] = [
 
 const DashboardPage = () => {
   return (
-    <div className="w-full flex flex-col justify-center items-center h-[576px]">
-      <div className="bg-white w-5xl flex flex-col justify-center rounded-[8px] p-4 shadow">
-        <h2 className="text-xl text-gray-900 font-bold mb-4">
-          Your Timesheets
-        </h2>
-        <TimeSheetTable timeSheetList={data} />
-      </div>
-      <Footer />
+    <div className="bg-white w-5xl flex flex-col justify-center rounded-[8px] p-4 shadow">
+      <h2 className="text-xl text-gray-900 font-bold mb-4">Your Timesheets</h2>
+      <TimeSheetTable timeSheetList={data} />
     </div>
   );
 };
