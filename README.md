@@ -51,3 +51,7 @@ These are the only valid credentials for the mock login.
 ## Assumptions & Notes
 
 - No real database or persistent storage; all data is in-memory and resets on server restart.
+
+## Time Spent
+
+- Around 10-12 hours.
