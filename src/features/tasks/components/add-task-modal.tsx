@@ -1,4 +1,6 @@
-import { ITask } from '@/types';
+import Select from '@/components/shared/select';
+import useFetch from '@/hooks/use-fetch';
+import { GetMetadataResponse, GetProjectsResponse, ITask } from '@/types';
 import React, { useState } from 'react';
 
 interface AddTaskModalProps {
@@ -16,6 +18,19 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   const [type, setType] = useState('Bug fixes');
   const [desc, setDesc] = useState('');
   const [hours, setHours] = useState(12);
+
+  const { data: projectsData, isLoading: isFetchingProjects } =
+    useFetch<GetProjectsResponse>('/api/v1/projects');
+
+  const { data: metadata, isLoading: isFetchingMetadata } =
+    useFetch<GetMetadataResponse>('/api/v1/metadata');
+
+  const onProjectValueChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setProject(e.target.value);
+  };
+  const onTypeValueChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setType(e.target.value);
+  };
 
   if (!open) return null;
 
@@ -52,14 +67,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 &#9432;
               </span>
             </label>
-            <select
-              className="w-full border border-gray-300 rounded px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            <Select
+              onValueChange={onProjectValueChange}
               value={project}
-              onChange={(e) => setProject(e.target.value)}
-            >
-              <option>Project Name</option>
-              <option>Another Project</option>
-            </select>
+              options={projectsData?.projects}
+              disable={!projectsData || isFetchingProjects}
+            />
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">
@@ -71,15 +84,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 &#9432;
               </span>
             </label>
-            <select
-              className="w-full border border-gray-300 rounded px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            <Select
+              onValueChange={onTypeValueChange}
+              options={metadata?.data.taskTypes}
               value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              <option>Bug fixes</option>
-              <option>Feature</option>
-              <option>Refactor</option>
-            </select>
+              disable={!metadata || isFetchingMetadata}
+            />
           </div>
           <div className="mb-2">
             <label className="block font-medium mb-1">
