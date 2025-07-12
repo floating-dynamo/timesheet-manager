@@ -1,36 +1,53 @@
+# ticktock Timesheet App
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Login Credentials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Email:** user@example.com
+- **Password:** password123
 
-## Learn More
+These are the only valid credentials for the mock login.
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **/app**: Next.js app directory (routing, layouts, pages)
+  - **(auth)/login/page.tsx**: Login screen
+  - **(main)/timesheets/**: Timesheet dashboard and details
+  - **api/**: API routes (NextAuth, timesheets, etc.)
+- **/components**: Shared UI components (header, footer, loader, etc.)
+- **/features**: Feature-specific logic and server routes (timesheets, projects, metadata)
+- **/hooks**: Custom React hooks (e.g., `use-fetch.tsx`)
+- **/lib**: Utilities (date formatting, status helpers)
+- **/providers**: Context providers (e.g., NextAuth session)
+- **/types**: TypeScript interfaces and enums
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API & Mock Data
 
-## Deploy on Vercel
+- All API endpoints are mocked using Hono and are routed via `/api/v1/*`.
+- Timesheet, project, and metadata data are static and live in `src/features/*/server/route.ts`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Authentication
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Uses NextAuth with credentials provider.
+- Only `/user@example.com` with password `password123` is valid.
+
+## Assumptions & Notes
+
+- No real database or persistent storage; all data is in-memory and resets on server restart.

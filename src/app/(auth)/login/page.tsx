@@ -1,6 +1,26 @@
-import React from 'react';
+'use client';
+
+import { signIn } from 'next-auth/react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (res?.ok) router.push('/timesheets');
+    else alert('Invalid credentials');
+  }
+
   return (
     <div className="min-h-screen flex items-stretch bg-gray-100 font-[family-name:var(--font-inter)]">
       {/* Left Side */}
@@ -8,7 +28,7 @@ const LoginPage = () => {
         <div className="flex flex-1 flex-col justify-center items-center">
           <div className="max-w-sm w-full mx-auto flex flex-col justify-center">
             <h2 className="text-xl font-semibold mb-8">Welcome back</h2>
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
@@ -19,6 +39,8 @@ const LoginPage = () => {
                 <input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoComplete="email"
@@ -34,6 +56,8 @@ const LoginPage = () => {
                 <input
                   id="password"
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   autoComplete="current-password"
                 />

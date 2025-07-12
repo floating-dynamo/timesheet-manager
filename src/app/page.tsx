@@ -6,10 +6,9 @@ export default function Home() {
       <h1>Developed by Sridhar Maskeri</h1>
       <div className="flex gap-8">
         <a
-          href="https://twitter.com/sridhar_maskeri"
+          href="https://x.com/sridharmaskeri"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Twitter"
         >
           <Twitter size={28} />
         </a>
@@ -17,7 +16,6 @@ export default function Home() {
           href="https://linkedin.com/in/sridhar_maskeri"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="LinkedIn"
         >
           <Linkedin size={28} />
         </a>
@@ -25,7 +23,6 @@ export default function Home() {
           href="https://github.com/floating-dynamo"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="GitHub"
         >
           <Github size={28} />
         </a>
