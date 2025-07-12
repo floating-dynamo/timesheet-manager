@@ -1,42 +1,38 @@
 'use client';
 import Loader from '@/components/shared/loader';
 import AddTaskModal from '@/features/tasks/components/add-task-modal';
+import useFetch from '@/hooks/use-fetch';
 import { dateDisplayFormat } from '@/lib/utils';
 import { ITask, ITimeSheetDetailsResponse } from '@/types';
+import axios from 'axios';
 import { EllipsisVerticalIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState, useRef } from 'react';
+import toast from 'react-hot-toast';
 
 const TimeSheetDetailsPage = () => {
-  const [openTaskModal, setOpenTaskModal] = useState(false);
-  const [timesheetData, setTimeSheetData] =
-    useState<ITimeSheetDetailsResponse | null>(null);
   const { id: timeSheetId } = useParams<{ id: string }>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [popoverTaskIdx, setPopoverTaskIdx] = useState<{ dayIdx: number; taskIdx: number } | null>(null);
+  const [openTaskModal, setOpenTaskModal] = useState(false);
+  const [reRenderTimeSheetList, setReRenderTimeSheetList] = useState(false);
+  const { data: timeSheetDetailsData, isLoading: isFetchingTimeSheetData } =
+    useFetch<ITimeSheetDetailsResponse | null>({
+      url: `/api/v1/timesheets/${timeSheetId}`,
+      reRender: reRenderTimeSheetList,
+    });
+  const [selectedDayId, setSelectedDayId] = useState('');
+  const [popoverTaskIdx, setPopoverTaskIdx] = useState<{
+    dayIdx: string;
+    taskIdx: string;
+  } | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    async function fetchTimeSheetDetails() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(`/api/v1/timesheets/${timeSheetId}`);
-        const data = await res.json();
-        console.log('Data: ', data.data);
-        setTimeSheetData(data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchTimeSheetDetails();
-  }, [timeSheetId]);
 
   // Close popover on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node)
+      ) {
         setPopoverTaskIdx(null);
       }
     }
@@ -48,7 +44,8 @@ const TimeSheetDetailsPage = () => {
     };
   }, [popoverTaskIdx]);
 
-  function showTaskModal() {
+  function showTaskModal(dayId: string) {
+    setSelectedDayId(dayId);
     setOpenTaskModal(true);
   }
 
@@ -57,18 +54,29 @@ const TimeSheetDetailsPage = () => {
     setOpenTaskModal(false);
   }
 
-  function onSubmitTask(task: ITask) {
+  async function onSubmitTask(task: ITask, dayId: string) {
     console.log(task);
+    console.log(dayId);
+    try {
+      await axios.post(`/api/v1/timesheets/${timeSheetId}/day/${dayId}`, task);
+      setReRenderTimeSheetList((prev) => !prev);
+      toast.success('Successully Added the task.');
+    } catch (error) {
+      console.log(error);
+      toast.error('Oops, something went wrong.');
+    }
     setOpenTaskModal(false);
   }
 
-  if (isLoading || !timesheetData || !timeSheetId) {
+  if (isFetchingTimeSheetData || !timeSheetDetailsData || !timeSheetId) {
     return (
       <div className="h-64 w-5xl bg-white flex items-center justify-center rounded-md shadow">
         <Loader text="Fetching Timesheet details" />
       </div>
     );
   }
+
+  const { data: timesheetData } = timeSheetDetailsData;
 
   const hoursPercentage =
     (timesheetData?.loggedHours / timesheetData?.totalHours) * 100;
@@ -84,8 +92,15 @@ const TimeSheetDetailsPage = () => {
           <div className="flex-col-reverse flex items-end justify-center">
             <div className="w-44 h-1.5 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-orange-400"
-                style={{ width: `${hoursPercentage}%` }}
+                className="h-full"
+                style={{
+                  width: `${hoursPercentage}%`,
+                  backgroundColor: `${
+                    hoursPercentage === 100
+                      ? '#05df72'
+                      : 'oklch(75% 0.183 55.934)'
+                  }`,
+                }}
               />
             </div>
             <span className="text-xs text-gray-500">{hoursPercentage}%</span>
@@ -99,7 +114,7 @@ const TimeSheetDetailsPage = () => {
         )}
       </div>
       <div className="divide-y divide-gray-100">
-        {timesheetData?.timeSheetTasks.map((day, dayIdx) => (
+        {timesheetData?.timeSheetTasks.map((day) => (
           <div key={day.date} className="py-4">
             <div className="font-semibold text-gray-700 mb-2">{day.date}</div>
             <div className="space-y-2">
@@ -119,54 +134,59 @@ const TimeSheetDetailsPage = () => {
                   </div>
                   <button
                     className="ml-4 cursor-pointer text-gray-400 hover:text-gray-600 relative"
-                    onClick={() => setPopoverTaskIdx({ dayIdx, taskIdx: tIdx })}
+                    onClick={() =>
+                      setPopoverTaskIdx({ dayIdx: day.id, taskIdx: task.id! })
+                    }
                   >
                     <EllipsisVerticalIcon className="size-4" />
                   </button>
-                  {popoverTaskIdx && popoverTaskIdx.dayIdx === dayIdx && popoverTaskIdx.taskIdx === tIdx && (
-                    <div
-                      ref={popoverRef}
-                      className="absolute right-0 top-8 z-10 bg-white border border-gray-200 rounded shadow-md w-28 py-1"
-                    >
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                        onClick={() => {
-                          setPopoverTaskIdx(null);
-                          // handleEdit(task) // implement as needed
-                        }}
+                  {popoverTaskIdx &&
+                    popoverTaskIdx.dayIdx === day.id &&
+                    popoverTaskIdx.taskIdx === task.id && (
+                      <div
+                        ref={popoverRef}
+                        className="absolute right-0 top-8 z-10 bg-white border border-gray-200 rounded shadow-md w-28 py-1"
                       >
-                        Edit
-                      </button>
-                      <button
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                        onClick={() => {
-                          setPopoverTaskIdx(null);
-                          // handleDelete(task) // implement as needed
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
+                        <button
+                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          onClick={() => {
+                            setPopoverTaskIdx(null);
+                            // handleEdit(task);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                          onClick={() => {
+                            setPopoverTaskIdx(null);
+                            // handleDelete(task);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                 </div>
               ))}
               <button
                 className="w-full border-2 border-dashed border-blue-200 rounded px-4 py-2 text-blue-600 text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                onClick={showTaskModal}
+                onClick={() => showTaskModal(day.id)}
               >
                 + Add new task
               </button>
             </div>
           </div>
         ))}
+        {openTaskModal && (
+          <AddTaskModal
+            onClose={onCloseTaskModal}
+            open={openTaskModal}
+            onSubmit={onSubmitTask}
+            dayId={selectedDayId}
+          />
+        )}
       </div>
-      {openTaskModal && (
-        <AddTaskModal
-          onClose={onCloseTaskModal}
-          open={openTaskModal}
-          onSubmit={onSubmitTask}
-        />
-      )}
     </div>
   );
 };

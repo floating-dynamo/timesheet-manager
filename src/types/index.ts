@@ -34,19 +34,22 @@ export interface GetTimeSheetsResponse {
 }
 
 export interface ITimeSheetTasks {
+  id: string;
   date: string;
   tasks: ITask[];
 }
 
 export interface ITimeSheetDetailsResponse {
-  totalHours: number;
-  loggedHours: number;
-  remainingHours: number;
-  dateRange: {
-    startDate: string;
-    endDate: string;
+  data: {
+    totalHours: number;
+    loggedHours: number;
+    remainingHours: number;
+    dateRange: {
+      startDate: string;
+      endDate: string;
+    };
+    timeSheetTasks: ITimeSheetTasks[];
   };
-  timeSheetTasks: ITimeSheetTasks[];
   success: boolean;
 }
 

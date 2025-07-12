@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 
-function useFetch<TResponse>(url: string, config?: AxiosRequestConfig) {
+function useFetch<TResponse>({
+  url,
+  config,
+  reRender,
+}: {
+  url: string;
+  config?: AxiosRequestConfig;
+  reRender?: boolean;
+}) {
   const [data, setData] = useState<TResponse>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +29,8 @@ function useFetch<TResponse>(url: string, config?: AxiosRequestConfig) {
       .finally(() => {
         setIsLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, JSON.stringify(config)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, JSON.stringify(config), reRender]);
 
   return { data, isLoading, error };
 }
