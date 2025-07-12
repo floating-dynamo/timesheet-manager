@@ -29,8 +29,8 @@ export default function Home() {
         </a>
       </div>
       <div>
-        <Link href={'/timesheets'} className='flex items-center justify-center gap-4 hover:underline'>
-          Go to TimeSheet Listing <MoveRightIcon className="size-5" />
+        <Link href={'/login'} className='flex items-center justify-center gap-4 hover:underline'>
+          Go to TimeSheet Management App <MoveRightIcon className="size-5" />
         </Link>
       </div>
     </div>
