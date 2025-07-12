@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -18,7 +19,11 @@ const LoginPage = () => {
     });
 
     if (res?.ok) router.push('/timesheets');
-    else alert('Invalid credentials');
+    else {
+      toast.error('Invalid credentials');
+      setEmail('');
+      setPassword('');
+    }
   }
 
   return (
